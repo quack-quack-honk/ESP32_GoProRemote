@@ -34,7 +34,9 @@ void setup(void)
     Serial.begin(115200);
     Serial.println("GoPro Control Ready");    Serial.println("Commands:");
     Serial.println("'connect' - Connect to GoPro");
-    Serial.println("'mode' - Switch between photo and video mode");
+    Serial.println("'video' - Switch to video mode");
+    Serial.println("'photo' - Switch to photo mode");
+    Serial.println("'timelapse' - Switch to timelapse mode");
     Serial.println("'trigger' - Start/take photo or video");
     Serial.println("'stop' - Stop recording");
     Serial.println("'power' - Power off GoPro");
