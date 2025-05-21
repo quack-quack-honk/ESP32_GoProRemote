@@ -9,7 +9,6 @@ BLEScan *ThisScan = ThisDevice->getScan();
 static BLEUUID ServiceUUID((uint16_t)0xFEA6);
 static BLEUUID CommandWriteCharacteristicUUID("b5f90072-aa8d-11e3-9046-0002a5d5c51b");
 static bool IsConnected = false;
-static bool IsRecording = false;
 
 bool ScanAndConnect(void)
 {
@@ -33,13 +32,12 @@ void setup(void)
     ThisDevice->init("");
     ThisDevice->setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
     Serial.begin(115200);
-    Serial.println("GoPro Control Ready");
-    Serial.println("Commands:");
+    Serial.println("GoPro Control Ready");    Serial.println("Commands:");
     Serial.println("'connect' - Connect to GoPro");
-    Serial.println("'start' - Start recording");
+    Serial.println("'mode' - Switch between photo and video mode");
+    Serial.println("'trigger' - Start/take photo or video");
     Serial.println("'stop' - Stop recording");
     Serial.println("'power' - Power off GoPro");
-    Serial.println("'status' - Show connection and recording status");
 }
 
 void loop(void)
@@ -59,37 +57,48 @@ void loop(void)
             else
             {
                 Serial.println("Failed to connect to GoPro");
-                IsConnected = false;
-            }
-        }
-        else if (command == "start" && IsConnected && !IsRecording)
+                IsConnected = false;        }        }
+        else if (command == "video" && IsConnected)
         {
-            Serial.println("Starting recording...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x03, 0x01, 0x01, 0x01});
-            IsRecording = true;
-            Serial.println("Recording started");
+            Serial.println("Switching to video mode...");
+            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x04, 0x3E, 0x02, 0x03, 0xE8});
+            Serial.println("Mode switched");
         }
-        else if (command == "stop" && IsConnected && IsRecording)
+        else if (command == "photo" && IsConnected)
+        {
+            Serial.println("Switching to photo mode...");
+            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x04, 0x3E, 0x02, 0x03, 0xE9});
+            Serial.println("Mode switched");
+        }
+        else if (command == "timelapse" && IsConnected)
+        {
+            Serial.println("Switching to timelapse mode...");
+            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x04, 0x3E, 0x02, 0x03, 0xEA});
+            Serial.println("Mode switched");
+        }
+        
+        else if (command == "trigger" && IsConnected)
+        {
+            Serial.println("Triggering camera...");
+            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x03, 0x01, 0x01, 0x01});
+            Serial.println("Camera triggered");
+        }
+        else if (command == "stop" && IsConnected)
         {
             Serial.println("Stopping recording...");
             ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x03, 0x01, 0x01, 0x00});
-            IsRecording = false;
             Serial.println("Recording stopped");
         }
         else if (command == "power" && IsConnected)
         {
             Serial.println("Powering off GoPro...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x01, 0x05});
-            IsConnected = false;
-            IsRecording = false;
+            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x01, 0x05});            IsConnected = false;
             Serial.println("GoPro powered off");
         }
         else if (command == "status")
         {
             Serial.print("Connection status: ");
             Serial.println(IsConnected ? "Connected" : "Disconnected");
-            Serial.print("Recording status: ");
-            Serial.println(IsRecording ? "Recording" : "Stopped");
         }
     }
 }
