@@ -7,13 +7,47 @@ class GoProControl:
     def __init__(self, root):
         self.root = root
         self.root.title("GoPro Control")
-        self.serial = None        # Serial frame
-        serial_frame = ttk.LabelFrame(root, text="Serial Port", padding="5")
+        self.serial = None
+        
+        # Configure dark theme
+        self.root.configure(bg="#2B2B2B")        
+        style = ttk.Style()
+        # Configure dark theme styles
+        style.configure("Dark.TLabelframe", background="#2B2B2B")
+        style.configure("Dark.TLabelframe.Label", foreground="#FFFFFF", background="#2B2B2B")
+        
+        # Configure button style with modern dark theme
+        style.configure("TButton",
+            foreground="#000000",
+            background="#FFFFFF",
+            borderwidth=1,
+            focuscolor="#FFFFFF",
+            lightcolor="#505050",
+            darkcolor="#2B2B2B",
+            relief="flat",
+            padding=6)
+        
+        # Button hover and pressed effects
+        style.map("TButton",
+            foreground=[('pressed', '#FFFFFF'), ('active', '#FFFFFF')],
+            background=[('pressed', '#303030'), ('active', '#505050'), ('!active', '#404040')],
+            relief=[('pressed', 'sunken'), ('!pressed', 'flat')])
+            
+        # Label and combobox styles
+        style.configure("TLabel", foreground="#FFFFFF", background="#2B2B2B")
+        style.configure("TCombobox", 
+            fieldbackground="#404040",
+            foreground="#FFFFFF",
+            selectbackground="#505050",
+            selectforeground="#FFFFFF")
+        
+        # Serial frame
+        serial_frame = ttk.LabelFrame(root, text="Serial Port", padding="5", style="Dark.TLabelframe")
         serial_frame.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
         
         # Port selection
         self.port_var = tk.StringVar()
-        ttk.Label(serial_frame, text="Port:").grid(row=0, column=0, padx=5, pady=5)
+        ttk.Label(serial_frame, text="Port:", style="TLabel").grid(row=0, column=0, padx=5, pady=5)
         self.port_combo = ttk.Combobox(serial_frame, textvariable=self.port_var)
         self.port_combo.grid(row=0, column=1, padx=5, pady=5)
         ttk.Button(serial_frame, text="Refresh", command=self.refresh_ports).grid(row=0, column=2, padx=5, pady=5)
@@ -22,14 +56,15 @@ class GoProControl:
         self.refresh_ports()
         
         # GoPro Connection frame
-        gopro_frame = ttk.LabelFrame(root, text="GoPro Connection", padding="5")
+        gopro_frame = ttk.LabelFrame(root, text="GoPro Connection", padding="5", style="Dark.TLabelframe")
         gopro_frame.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
         
         # Connect button
         self.gopro_btn = ttk.Button(gopro_frame, text="Connect/Wake", command=lambda: self.send_command("connect"))
         self.gopro_btn.grid(row=0, column=0, padx=5, pady=5)
-          # Mode frame
-        mode_frame = ttk.LabelFrame(root, text="Mode", padding="5")
+        
+        # Mode frame
+        mode_frame = ttk.LabelFrame(root, text="Mode", padding="5", style="Dark.TLabelframe")
         mode_frame.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
         
         # Mode buttons
@@ -38,7 +73,7 @@ class GoProControl:
         ttk.Button(mode_frame, text="Timelapse Mode", command=lambda: self.send_command("timelapse")).grid(row=0, column=2, padx=5, pady=5)
         
         # Control frame
-        ctrl_frame = ttk.LabelFrame(root, text="Control", padding="5")
+        ctrl_frame = ttk.LabelFrame(root, text="Control", padding="5", style="Dark.TLabelframe")
         ctrl_frame.grid(row=3, column=0, padx=5, pady=5, sticky="ew")
         
         # Control buttons
@@ -47,11 +82,13 @@ class GoProControl:
         ttk.Button(ctrl_frame, text="Power Off", command=lambda: self.send_command("power")).grid(row=0, column=2, padx=5, pady=5)
         
         # Status frame
-        status_frame = ttk.LabelFrame(root, text="Status", padding="5")
+        status_frame = ttk.LabelFrame(root, text="Status", padding="5", style="Dark.TLabelframe")
         status_frame.grid(row=4, column=0, padx=5, pady=5, sticky="ew")
         
         # Status text
-        self.status_text = tk.Text(status_frame, height=5, width=40)
+        self.status_text = tk.Text(status_frame, height=5, width=40,
+                                 bg="#2B2B2B", fg="#FFFFFF",
+                                 insertbackground="#FFFFFF")
         self.status_text.grid(row=0, column=0, padx=5, pady=5)
         
         # Make window non-resizable
@@ -63,6 +100,7 @@ class GoProControl:
         self.port_combo['values'] = ports
         if ports:
             self.port_combo.set(ports[0])
+    
     def connect_serial(self):
         """Connect or disconnect from the serial port"""
         if self.serial is None:
