@@ -62,39 +62,77 @@ void loop(void)
                 IsConnected = false;        }        }
         else if (command == "video" && IsConnected)
         {
-            Serial.println("Switching to video mode...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x04, 0x3E, 0x02, 0x03, 0xE8});
-            Serial.println("Mode switched");
+            Serial.println("Switching to video mode...");            
+            auto* characteristic = ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID);
+            characteristic->writeValue({0x04, 0x3E, 0x02, 0x03, 0xE8});
+            std::string response = characteristic->readValue();
+            Serial.print("Response: ");
+            for(int i = 0; i < response.length(); i++) {
+                Serial.printf("%02X ", (uint8_t)response[i]);
+            }
+            Serial.println();
         }
         else if (command == "photo" && IsConnected)
         {
-            Serial.println("Switching to photo mode...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x04, 0x3E, 0x02, 0x03, 0xE9});
-            Serial.println("Mode switched");
+            Serial.println("Switching to photo mode...");            
+            auto* characteristic = ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID);
+            characteristic->writeValue({0x04, 0x3E, 0x02, 0x03, 0xE9});
+            std::string response = characteristic->readValue();
+            Serial.print("Response: ");
+            for(int i = 0; i < response.length(); i++) {
+                Serial.printf("%02X ", (uint8_t)response[i]);
+            }
+            Serial.println();
         }
         else if (command == "timelapse" && IsConnected)
         {
-            Serial.println("Switching to timelapse mode...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x04, 0x3E, 0x02, 0x03, 0xEA});
-            Serial.println("Mode switched");
+            Serial.println("Switching to timelapse mode...");            
+            auto* characteristic = ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID);
+            characteristic->writeValue({0x04, 0x3E, 0x02, 0x03, 0xEA});
+            std::string response = characteristic->readValue();
+            Serial.print("Response: ");
+            for(int i = 0; i < response.length(); i++) {
+                Serial.printf("%02X ", (uint8_t)response[i]);
+            }
+            Serial.println();
         }
         
         else if (command == "trigger" && IsConnected)
-        {
-            Serial.println("Triggering camera...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x03, 0x01, 0x01, 0x01});
-            Serial.println("Camera triggered");
+        {            
+            Serial.println("Triggering camera...");            
+            auto* characteristic = ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID);
+            characteristic->writeValue({0x03, 0x01, 0x01, 0x01});
+            std::string response = characteristic->readValue();
+            Serial.print("Response: ");
+            for(int i = 0; i < response.length(); i++) {
+                Serial.printf("%02X ", (uint8_t)response[i]);
+            }
+            Serial.println();
         }
         else if (command == "stop" && IsConnected)
         {
-            Serial.println("Stopping recording...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x03, 0x01, 0x01, 0x00});
-            Serial.println("Recording stopped");
+            Serial.println("Stopping recording...");            
+            auto* characteristic = ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID);
+            characteristic->writeValue({0x03, 0x01, 0x01, 0x00});
+            std::string response = characteristic->readValue();
+            Serial.print("Response: ");
+            for(int i = 0; i < response.length(); i++) {
+                Serial.printf("%02X ", (uint8_t)response[i]);
+            }
+            Serial.println();
         }
         else if (command == "power" && IsConnected)
         {
-            Serial.println("Powering off GoPro...");
-            ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID)->writeValue({0x01, 0x05});            IsConnected = false;
+            Serial.println("Powering off GoPro...");            
+            auto* characteristic = ServiceCharacteristic(ServiceUUID, CommandWriteCharacteristicUUID);
+            characteristic->writeValue({0x01, 0x05});
+            std::string response = characteristic->readValue();
+            Serial.print("Response: ");
+            for(int i = 0; i < response.length(); i++) {
+                Serial.printf("%02X ", (uint8_t)response[i]);
+            }
+            Serial.println();
+            IsConnected = false;
             Serial.println("GoPro powered off");
         }
         else if (command == "status")
